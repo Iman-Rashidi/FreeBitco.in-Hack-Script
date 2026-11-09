@@ -13,7 +13,7 @@ test('calculates exact theoretical probability for an inclusive range', () => {
 });
 
 test('uses injected randomness and counts the threshold inclusively', () => {
-  const samples = [0, 0.09, 0.1, 0.99];
+  const samples = [0.09, 0.1, 0.2, 0.99];
   let index = 0;
   const result = simulateRolls({
     rounds: samples.length,
