@@ -52,22 +52,16 @@ test('Wilson confidence interval contains the observed proportion', () => {
   assert.ok(interval.upper <= 1);
 });
 
-test('risk engine reports exact expected value and RTP', () => {
-  const result = simulateRisk({
-    paths: 2, roundsPerPath: 2, winProbability: 1, stake: 1,
-    payoutMultiplier: 2, bankroll: 10, random: () => 0.5
-  });
+test('risk engine reports exact theoretical value and RTP', () => {
+  const result = simulateRisk({ paths: 2, roundsPerPath: 2, winProbability: 1, stake: 1, payoutMultiplier: 2, bankroll: 10, random: () => 0.5 });
   assert.equal(result.theoreticalRtp, 2);
   assert.equal(result.expectedNetPerRound, 1);
   assert.equal(result.ruinProbability, 0);
-  assert.equal(result.averageFinalBankroll, 14);
+  assert.equal(result.averageFinalBankroll, 12);
 });
 
 test('risk engine detects inability to fund the next stake', () => {
-  const result = simulateRisk({
-    paths: 1, roundsPerPath: 3, winProbability: 0, stake: 1,
-    payoutMultiplier: 2, bankroll: 2, random: () => 0.9
-  });
+  const result = simulateRisk({ paths: 1, roundsPerPath: 3, winProbability: 0, stake: 1, payoutMultiplier: 2, bankroll: 2, random: () => 0.9 });
   assert.equal(result.bankruptPaths, 1);
   assert.equal(result.averageCompletedRounds, 2);
   assert.equal(result.averageFinalBankroll, 0);
@@ -80,12 +74,10 @@ test('risk simulations are reproducible and enforce total work limits', () => {
   assert.throws(() => simulateRisk({ winProbability: 1.1 }), /winProbability/);
 });
 
-test('CLI parser supports both modes and validates mode', () => {
-  assert.deepEqual(parseArgs(['--rounds', '100', '--seed', 'demo', '--json']), {
-    mode: 'rolls', options: { rounds: 100, seed: 'demo' }, json: true
-  });
-  assert.deepEqual(parseArgs(['--mode', 'risk', '--probability', '0.4', '--payout', '2']), {
-    mode: 'risk', options: { winProbability: 0.4, payoutMultiplier: 2 }, json: false
+test('CLI parser supports both modes and maps risk rounds correctly', () => {
+  assert.deepEqual(parseArgs(['--rounds', '100', '--seed', 'demo', '--json']), { mode: 'rolls', options: { rounds: 100, seed: 'demo' }, json: true });
+  assert.deepEqual(parseArgs(['--mode', 'risk', '--probability', '0.4', '--payout', '2', '--rounds', '25']), {
+    mode: 'risk', options: { winProbability: 0.4, payoutMultiplier: 2, roundsPerPath: 25 }, json: false
   });
   assert.equal(parseArgs(['--help']).help, true);
   assert.throws(() => parseArgs(['--unknown']), /Unknown option/);
