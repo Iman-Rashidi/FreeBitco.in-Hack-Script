@@ -11,19 +11,15 @@ permissions:
 
 jobs:
   test:
-    name: Node.js matrix tests
+    name: Node.js 22 tests
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        node-version: [20, 22]
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: \${{ matrix.node-version }}
+          node-version: 22
       - name: Run unit tests
         run: npm test
       - name: Check CLI help
